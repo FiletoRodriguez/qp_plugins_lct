@@ -66,6 +66,8 @@ subroutine non_hrmt_real_diag(n,A,reigvec,leigvec,n_real_eigv,eigval)
  integer :: i,j,k
  integer :: n_good
  integer, allocatable :: list_good(:), iorder(:)
+ double precision :: thr
+ thr = 1.d-5
  ! Eigvalue(n) = WR(n) + i * WI(n)
  allocate(WR(n),WI(n),VL(n,n),VR(n,n),Aw(n,n))
  Aw = A
@@ -73,7 +75,7 @@ subroutine non_hrmt_real_diag(n,A,reigvec,leigvec,n_real_eigv,eigval)
  ! You track the real eigenvalues 
  n_good = 0
  do i = 1, n
-  if(dabs(WI(i)).lt.1.d-12)then
+  if(dabs(WI(i)).lt.thr)then
    n_good += 1
   else
    print*,'Found an imaginary component to eigenvalue'
@@ -83,7 +85,7 @@ subroutine non_hrmt_real_diag(n,A,reigvec,leigvec,n_real_eigv,eigval)
  allocate(list_good(n_good),iorder(n_good))
  n_good = 0
  do i = 1, n
-  if(dabs(WI(i)).lt.1.d-12)then
+  if(dabs(WI(i)).lt.thr)then
    n_good += 1
    list_good(n_good) = i
    eigval(n_good) = WR(i)
@@ -98,7 +100,7 @@ subroutine non_hrmt_real_diag(n,A,reigvec,leigvec,n_real_eigv,eigval)
  print*,'n_real_eigv = ',n_real_eigv
  print*,'n           = ',n
  do i = 1, n_real_eigv
-  print*,i,'eigval(i) = ',eigval(i) 
+!  print*,i,'eigval(i) = ',eigval(i) 
   do j = 1, n
    reigvec(j,i) = VR(j,list_good(iorder(i)))
    leigvec(j,i) = Vl(j,list_good(iorder(i)))
